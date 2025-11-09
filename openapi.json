@@ -1,0 +1,329 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Incident Management API",
+      "version": "v0.0.1"
+    },
+    "paths": {
+      "/incidents/": {
+        "post": {
+          "tags": [
+            "incidents"
+          ],
+          "summary": "Создать инцидент",
+          "description": "Создание нового инцидента",
+          "operationId": "create_incident_incidents__post",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentCreate"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/IncidentResponse"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "get": {
+          "tags": [
+            "incidents"
+          ],
+          "summary": "Получить список инцидентов",
+          "description": "Получить список всех инцидентов с возможностью фильтрации по статусу и пагинацией",
+          "operationId": "get_incidents_incidents__get",
+          "parameters": [
+            {
+              "name": "status",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/StatusEnum"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "description": "Фильтр по статусу",
+                "title": "Status"
+              },
+              "description": "Фильтр по статусу"
+            },
+            {
+              "name": "skip",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "minimum": 0,
+                "default": 0,
+                "title": "Skip"
+              }
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "required": false,
+              "schema": {
+                "type": "integer",
+                "maximum": 1000,
+                "minimum": 1,
+                "default": 100,
+                "title": "Limit"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/IncidentResponse"
+                    },
+                    "title": "Response Get Incidents Incidents  Get"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/incidents/{incident_id}": {
+        "patch": {
+          "tags": [
+            "incidents"
+          ],
+          "summary": "Обновить статус инцидента",
+          "description": "Обновление статуса инцидента по ID",
+          "operationId": "update_incident_status_incidents__incident_id__patch",
+          "parameters": [
+            {
+              "name": "incident_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "integer",
+                "title": "Incident Id"
+              }
+            }
+          ],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncidentUpdate"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/IncidentResponse"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Validation Error",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/HTTPValidationError"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/health": {
+        "get": {
+          "summary": "Health Check",
+          "operationId": "health_check_health_get",
+          "responses": {
+            "200": {
+              "description": "Successful Response",
+              "content": {
+                "application/json": {
+                  "schema": {
+  
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "HTTPValidationError": {
+          "properties": {
+            "detail": {
+              "items": {
+                "$ref": "#/components/schemas/ValidationError"
+              },
+              "type": "array",
+              "title": "Detail"
+            }
+          },
+          "type": "object",
+          "title": "HTTPValidationError"
+        },
+        "IncidentCreate": {
+          "properties": {
+            "description": {
+              "type": "string",
+              "title": "Description"
+            },
+            "source": {
+              "$ref": "#/components/schemas/SourceEnum"
+            }
+          },
+          "type": "object",
+          "required": [
+            "description",
+            "source"
+          ],
+          "title": "IncidentCreate"
+        },
+        "IncidentResponse": {
+          "properties": {
+            "description": {
+              "type": "string",
+              "title": "Description"
+            },
+            "source": {
+              "$ref": "#/components/schemas/SourceEnum"
+            },
+            "id": {
+              "type": "integer",
+              "title": "Id"
+            },
+            "status": {
+              "$ref": "#/components/schemas/StatusEnum"
+            },
+            "created_at": {
+              "type": "string",
+              "format": "date-time",
+              "title": "Created At"
+            }
+          },
+          "type": "object",
+          "required": [
+            "description",
+            "source",
+            "id",
+            "status",
+            "created_at"
+          ],
+          "title": "IncidentResponse"
+        },
+        "IncidentUpdate": {
+          "properties": {
+            "status": {
+              "$ref": "#/components/schemas/StatusEnum"
+            }
+          },
+          "type": "object",
+          "required": [
+            "status"
+          ],
+          "title": "IncidentUpdate"
+        },
+        "SourceEnum": {
+          "type": "string",
+          "enum": [
+            "operator",
+            "monitoring",
+            "partner"
+          ],
+          "title": "SourceEnum"
+        },
+        "StatusEnum": {
+          "type": "string",
+          "enum": [
+            "open",
+            "in_process",
+            "resolved",
+            "closed"
+          ],
+          "title": "StatusEnum"
+        },
+        "ValidationError": {
+          "properties": {
+            "loc": {
+              "items": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ]
+              },
+              "type": "array",
+              "title": "Location"
+            },
+            "msg": {
+              "type": "string",
+              "title": "Message"
+            },
+            "type": {
+              "type": "string",
+              "title": "Error Type"
+            }
+          },
+          "type": "object",
+          "required": [
+            "loc",
+            "msg",
+            "type"
+          ],
+          "title": "ValidationError"
+        }
+      }
+    }
+  }
